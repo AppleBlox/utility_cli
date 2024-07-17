@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <CoreGraphics/CoreGraphics.h>
 #include <ApplicationServices/ApplicationServices.h>
+#import <Foundation/Foundation.h>
 
 // Cache for process IDs
 std::unordered_map<std::string, pid_t> processCache;
@@ -176,22 +177,89 @@ bool renameWindow(const std::string& oldName, const std::string& newName) {
     return true;
 }
 
+// Function to get the current display mode
+CGDisplayModeRef getCurrentDisplayMode(CGDirectDisplayID display) {
+    return CGDisplayCopyDisplayMode(display);
+}
+
+// Function to set the display mode
+bool setDisplayMode(CGDirectDisplayID display, int width, int height) {
+    CFArrayRef modes = CGDisplayCopyAllDisplayModes(display, NULL);
+    CFIndex count = CFArrayGetCount(modes);
+
+    for (CFIndex i = 0; i < count; ++i) {
+        CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
+        int modeWidth = (int)CGDisplayModeGetWidth(mode);
+        int modeHeight = (int)CGDisplayModeGetHeight(mode);
+
+        if (modeWidth == width && modeHeight == height) {
+            CGError err = CGDisplaySetDisplayMode(display, mode, NULL);
+            CFRelease(modes);
+            return err == kCGErrorSuccess;
+        }
+    }
+
+    CFRelease(modes);
+    return false;
+}
+
+bool changeResolution(int width, int height, int duration) {
+    CGDirectDisplayID display = CGMainDisplayID();
+
+    // Get current display mode
+    CGDisplayModeRef originalMode = getCurrentDisplayMode(display);
+    if (originalMode == NULL) {
+        std::cerr << "Failed to get current display mode\n";
+        return false;
+    }
+
+    // Change to new resolution
+    if (setDisplayMode(display, width, height)) {
+        std::cout << "Resolution changed to " << width << "x" << height << "\n";
+
+        // Wait for the specified duration
+        sleep(duration);
+
+        // Restore original resolution
+        CGError err = CGDisplaySetDisplayMode(display, originalMode, NULL);
+        CGDisplayModeRelease(originalMode);
+        if (err == kCGErrorSuccess) {
+            std::cout << "Resolution restored to original setting\n";
+        } else {
+            std::cerr << "Failed to restore original resolution\n";
+            return false;
+        }
+    } else {
+        std::cerr << "Failed to change resolution to " << width << "x" << height << "\n";
+        return false;
+    }
+
+    return true;
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 4) {
-        std::cout << "Usage: " << argv[0] << " move|resize|rename <window_name> <param1> [param2]\n";
+        std::cout << "Usage: " << argv[0] << " move|resize|rename|setres <window_name> <param1> [param2]\n";
         return 1;
     }
 
     std::string command = argv[1];
-    std::string windowName = argv[2];
 
     try {
         if (command == "move" && argc == 5) {
+            std::string windowName = argv[2];
             return moveWindow(windowName, std::stoi(argv[3]), std::stoi(argv[4])) ? 0 : 1;
         } else if (command == "resize" && argc == 5) {
+            std::string windowName = argv[2];
             return resizeWindow(windowName, std::stoi(argv[3]), std::stoi(argv[4])) ? 0 : 1;
         } else if (command == "rename" && argc == 4) {
+            std::string windowName = argv[2];
             return renameWindow(windowName, argv[3]) ? 0 : 1;
+        } else if (command == "setres" && argc == 4) {
+            int width = std::stoi(argv[2]);
+            int height = std::stoi(argv[3]);
+            int duration = 10; // Set the resolution change duration to 10 seconds
+            return changeResolution(width, height, duration) ? 0 : 1;
         } else {
             std::cout << "Invalid command or arguments\n";
             return 1;
