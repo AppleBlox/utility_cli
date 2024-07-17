@@ -215,7 +215,7 @@ bool changeResolution(int width, int height, int duration) {
 
     // Change to new resolution
     if (setDisplayMode(display, width, height)) {
-        std::cout << "Resolution changed to " << width << "x" << height << "\n";
+        std::cout << "Resolution changed to " << width << "x" << height << " for " << duration << " seconds\n";
 
         // Wait for the specified duration
         sleep(duration);
@@ -239,7 +239,7 @@ bool changeResolution(int width, int height, int duration) {
 
 int main(int argc, char* argv[]) {
     if (argc < 4) {
-        std::cout << "Usage: " << argv[0] << " move|resize|rename|setres <window_name> <param1> [param2]\n";
+        std::cout << "Usage: " << argv[0] << " move|resize|rename|setres <window_name> <param1> [param2] [param3]\n";
         return 1;
     }
 
@@ -255,10 +255,10 @@ int main(int argc, char* argv[]) {
         } else if (command == "rename" && argc == 4) {
             std::string windowName = argv[2];
             return renameWindow(windowName, argv[3]) ? 0 : 1;
-        } else if (command == "setres" && argc == 4) {
+        } else if (command == "setres" && (argc == 5 || argc == 6)) {
             int width = std::stoi(argv[2]);
             int height = std::stoi(argv[3]);
-            int duration = 10; // Set the resolution change duration to 10 seconds
+            int duration = (argc == 6) ? std::stoi(argv[4]) : 10; // Default to 10 seconds if duration is not provided
             return changeResolution(width, height, duration) ? 0 : 1;
         } else {
             std::cout << "Invalid command or arguments\n";
