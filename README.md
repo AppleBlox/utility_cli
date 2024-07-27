@@ -1,5 +1,5 @@
-# window_manager
-A simple c++ script to move and resize windows from the terminal.
+# utility_cli
+Simple c++ scripts to perform OS level operations from anything (bash, js, etc...)
 
 To compile, run: `clang++ -std=c++11 -arch arm64 -arch x86_64 -framework CoreGraphics -framework ApplicationServices window_manager.mm -o window_manager`
 
