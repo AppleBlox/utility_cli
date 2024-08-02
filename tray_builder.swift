@@ -9,6 +9,7 @@ struct MenuItem: Codable {
     let isBold: Bool
     let isUnderlined: Bool
     let isDisabled: Bool
+    let isChecked: Bool? // Added for checkbox support
 }
 
 struct MenuConfig: Codable {
@@ -50,6 +51,13 @@ class TrayManager: NSObject {
             case "label":
                 menuItem = NSMenuItem(title: item.title, action: nil, keyEquivalent: "")
                 menuItem.isEnabled = false
+            case "checkbox":
+                menuItem = NSMenuItem(title: item.title, action: #selector(checkboxToggled(_:)), keyEquivalent: "")
+                menuItem.target = self
+                menuItem.representedObject = item.id
+                if let isChecked = item.isChecked {
+                    menuItem.state = isChecked ? .on : .off
+                }
             default:
                 print("Unknown item type: \(item.type)")
                 continue
@@ -87,7 +95,14 @@ class TrayManager: NSObject {
 
     @objc func menuItemClicked(_ sender: NSMenuItem) {
         if let id = sender.representedObject as? String {
-            print("clicked: \(id)")
+            print("clicked:\(id)")
+        }
+    }
+
+    @objc func checkboxToggled(_ sender: NSMenuItem) {
+        if let id = sender.representedObject as? String {
+            sender.state = sender.state == .on ? .off : .on
+            print("toggled:\(id):\(sender.state.rawValue)")
         }
     }
 
