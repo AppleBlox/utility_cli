@@ -59,7 +59,7 @@ class TrayManager: NSObject {
                     menuItem.state = isChecked ? .on : .off
                 }
             default:
-                print("Unknown item type: \(item.type)")
+                printAndFlush("Unknown item type: \(item.type)")
                 continue
             }
             
@@ -95,25 +95,25 @@ class TrayManager: NSObject {
 
     @objc func menuItemClicked(_ sender: NSMenuItem) {
         if let id = sender.representedObject as? String {
-            print("clicked:\(id)")
+            printAndFlush("clicked: \(id)")
         }
     }
 
     @objc func checkboxToggled(_ sender: NSMenuItem) {
         if let id = sender.representedObject as? String {
             sender.state = sender.state == .on ? .off : .on
-            print("toggled:\(id):\(sender.state.rawValue)")
+            printAndFlush("Checkbox toggled: \(id), new state: \(sender.state.rawValue)")
         }
     }
 
     @objc func quit() {
-        print("quit")
+        printAndFlush("quit")
         NSApplication.shared.terminate(nil)
     }
 
     func loadConfig(from jsonString: String) {
         guard let data = jsonString.data(using: .utf8) else {
-            print("Failed to load configuration data.")
+            printAndFlush("Failed to load configuration data.")
             return
         }
 
@@ -127,7 +127,7 @@ class TrayManager: NSObject {
                 setIcon(name: trayIcon)
             }
         } catch {
-            print("Failed to decode configuration: \(error)")
+            printAndFlush("Failed to decode configuration: \(error)")
         }
     }
 
@@ -136,9 +136,14 @@ class TrayManager: NSObject {
             if let image = NSImage(contentsOfFile: name) ?? NSImage(systemSymbolName: name, accessibilityDescription: name) {
                 button.image = image
             } else {
-                print("Failed to set icon: \(name)")
+                printAndFlush("Failed to set icon: \(name)")
             }
         }
+    }
+
+    func printAndFlush(_ message: String) {
+        print(message)
+        fflush(stdout)
     }
 }
 
