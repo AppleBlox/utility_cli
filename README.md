@@ -18,5 +18,5 @@ Note: As I'm not an expert nor do I know c++, I've used ChatGPT and Claude3.5 to
 ### Exemple for tray_builder
 
 ```
-./tray_builder --config '{"trayIcon":"star.fill","menuItems":[{"type":"normal","title":"Open","id":"open","icon":"star.fill","isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"separator","title":"","id":"","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"label","title":"Label","id":"label","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"normal","title":"Disabled Item","id":"disabled_item","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":true}],"showQuitItem":false}'
+./tray_builder --config '{"trayIcon":"star.fill","menuItems":[{"type":"normal","title":"Open","id":"open","icon":"star.fill","isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"separator","title":"","id":"","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"label","title":"Label","id":"label","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":false},{"type":"checkbox","title":"Checkbox Item","id":"checkbox_item","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":false,"isChecked":true},{"type":"normal","title":"Disabled Item","id":"disabled_item","icon":null,"isBold":false,"isUnderlined":false,"isDisabled":true}],"showQuitItem":false}'
 ```
